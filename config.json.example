@@ -1,0 +1,10 @@
+{
+    "apikey": "your_api_key_here",
+    "secretapikey": "your_secret_api_key_here",
+    "domain": "example.com",
+    "records": [
+        { "name": "www" },
+        { "name": "home" },
+        { "name": "@" }
+    ]
+}
