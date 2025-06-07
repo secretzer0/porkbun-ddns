@@ -1,5 +1,10 @@
 # Porkbun Dynamic DNS Client
 
+[![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/release/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/releases)
+[![GitHub stars](https://img.shields.io/github/stars/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/stargazers)
+
 A Python script to automatically update DNS records on Porkbun when your external IP address changes. Perfect for home servers, self-hosted services, or any scenario where you need to keep DNS records synchronized with a dynamic IP address.
 
 ## Table of Contents
