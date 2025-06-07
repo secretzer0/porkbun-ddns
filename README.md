@@ -75,14 +75,23 @@ For OPNsense firewall/router systems, follow these steps to integrate the script
 4. **Create the OPNsense action configuration file**:
    ```bash
    cat > /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf << 'EOF'
-[update]
-command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
-parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache
-type:script
-message:updating ddns
-description:PorkBun DDNS
-EOF
    ```
+   
+   The file content should be:
+   ```ini
+   [update]
+   command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
+   parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache
+   type:script
+   message:updating ddns
+   description:PorkBun DDNS
+   ```
+   
+   Then close the heredoc:
+   ```bash
+   EOF
+   ```
+   
    **Note:** Ensure the command path matches the exact filename (`porkbun_ddns.py`, not `porkbun-ddns.py`)
 
 5. **Set proper permissions for the action file**:
@@ -149,14 +158,23 @@ configctl porkbun update
 #### Advanced OPNsense Configuration (Optional)
 
 For persistent logging across reboots, modify the action configuration:
+
 ```bash
 cat > /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf << 'EOF'
+```
+
+The file content should be:
+```ini
 [update]
 command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
 parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache --log-file /var/log/porkbun.ddns.log
 type:script
 message:updating ddns
 description:PorkBun DDNS
+```
+
+Then close the heredoc:
+```bash
 EOF
 ```
 
