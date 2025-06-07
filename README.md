@@ -5,13 +5,13 @@
 [![GitHub release](https://img.shields.io/github/release/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/releases)
 [![GitHub stars](https://img.shields.io/github/stars/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/stargazers)
 
-A focused Python script for automatic Porkbun DNS updates, designed for reliability and simplicity. Born from frustration with expensive domain API pricing, this tool provides a lightweight alternative to complex multi-provider solutions.
+A focused Python script for automatic Porkbun DNS updates on OPNsense systems. **Fills the gap where OPNsense's ddclient package doesn't yet support Porkbun.** Born from frustration with expensive domain API pricing and the need for reliable Porkbun integration.
 
 **Perfect for:**
-- OPNsense users wanting native service integration
-- Porkbun-focused setups that don't need ddclient's complexity  
-- Cost-conscious users who switched from expensive DNS providers
+- **OPNsense users needing Porkbun support** (not available in ddclient package)
+- Users who switched from expensive DNS providers to Porkbun
 - Homelab environments requiring reliable, minimal-dependency solutions
+- Anyone wanting native OPNsense service integration
 
 ## Table of Contents
 
@@ -348,12 +348,15 @@ python porkbun_ddns.py config.json ip_cache.txt --debug
 
 ### Why not use ddclient?
 
-ddclient is excellent for multi-provider environments, but this tool offers:
-- **Native OPNsense integration** with configd service framework
-- **Porkbun-focused design** without unnecessary complexity
+While ddclient supports Porkbun in general, **OPNsense's ddclient package doesn't include Porkbun support yet**. This tool fills that gap by providing:
+
+- **Immediate Porkbun support** for OPNsense users
+- **Native OPNsense integration** with configd service framework  
+- **Purpose-built solution** while waiting for official ddclient package updates
 - **Minimal dependencies** (just Python + requests)
 - **Filesystem-safe logging** with automatic rotation
-- **Lightweight footprint** perfect for embedded systems
+
+*Note: This tool bridges the gap until OPNsense's ddclient package potentially adds Porkbun support in future releases.*
 
 ### Why Porkbun?
 
