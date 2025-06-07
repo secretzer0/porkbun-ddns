@@ -127,8 +127,8 @@ EOF
 - Python 3 is pre-installed on OPNsense systems
 - The `requests` library is typically available by default
 - If you encounter import errors, install requests with: `python3 -m pip install requests`
-- The script logs to `/tmp/porkbun.ddns.log` which persists until reboot
-- For persistent logging, consider redirecting to `/var/log/` instead
+- **Logging**: Default `/tmp` location is cleared on reboot; consider using `--log-file /var/log/porkbun.ddns.log` for persistence
+- **Log rotation**: Automatically prevents `/tmp` filesystem overflow with 1MB max file size and 3 backups (4MB total max)
 
 **Testing the OPNsense Installation:**
 ```bash
@@ -137,6 +137,20 @@ EOF
 
 # Test via the OPNsense action system
 configctl porkbun update
+```
+
+**Advanced OPNsense Configuration (Optional):**
+
+For persistent logging across reboots, modify the action configuration:
+```bash
+cat > /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf << 'EOF'
+[update]
+command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
+parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache --log-file /var/log/porkbun.ddns.log
+type:script
+message:updating ddns
+description:PorkBun DDNS
+EOF
 ```
 
 ## Configuration
@@ -190,6 +204,9 @@ python porkbun_ddns.py config.json ip_cache.txt --debug
 # Specify IP address manually
 python porkbun_ddns.py config.json ip_cache.txt -i 192.168.1.100
 
+# Custom log file location and size limits
+python porkbun_ddns.py config.json ip_cache.txt --log-file /var/log/porkbun.ddns.log --log-max-size 2 --log-backup-count 5
+
 # Show help
 python porkbun_ddns.py --help
 ```
@@ -200,6 +217,9 @@ python porkbun_ddns.py --help
 - `cache`: Path to IP cache file (will be created if it doesn't exist)
 - `-i, --ip`: Manually specify IP address instead of auto-detection
 - `--debug`: Enable verbose debug logging
+- `--log-file`: Custom log file path (default: /tmp/porkbun.ddns.log)
+- `--log-max-size`: Maximum log file size in MB before rotation (default: 1)
+- `--log-backup-count`: Number of backup log files to keep (default: 3)
 
 ## Automation
 
@@ -237,13 +257,39 @@ crontab -e
 
 ## Logging
 
-The script logs to both stdout and `/tmp/porkbun.ddns.log` (or equivalent temp directory on Windows). Use `--debug` flag for detailed logging.
+The script uses rotating log files to prevent filesystem overflow, especially important on systems with limited `/tmp` space like OPNsense.
+
+### Log Rotation Features
+
+- **Automatic rotation**: When log file reaches maximum size (default: 1MB)
+- **Backup retention**: Keeps a configurable number of backup files (default: 3)
+- **Total storage limit**: With defaults, maximum ~4MB total log storage
+- **Configurable**: Adjust log file location, size limits, and backup count
 
 ### Log Levels
 
-- **INFO**: Normal operation messages
+- **INFO**: Normal operation messages (IP changes, DNS updates)
 - **DEBUG**: Detailed operation information (use `--debug` flag)
 - **ERROR**: Error conditions that prevent operation
+
+### Log File Locations
+
+- **Default**: `/tmp/porkbun.ddns.log` (with `.1`, `.2`, `.3` backups)
+- **Custom**: Use `--log-file` parameter to specify alternative location
+- **OPNsense recommendation**: Consider `/var/log/porkbun.ddns.log` for persistence across reboots
+
+### Examples
+
+```bash
+# Default logging (1MB max, 3 backups, /tmp location)
+python porkbun_ddns.py config.json cache.txt
+
+# Custom log location and larger size limits
+python porkbun_ddns.py config.json cache.txt --log-file /var/log/porkbun.ddns.log --log-max-size 5 --log-backup-count 2
+
+# Minimal logging for space-constrained systems
+python porkbun_ddns.py config.json cache.txt --log-max-size 0.5 --log-backup-count 1
+```
 
 ## How It Works
 

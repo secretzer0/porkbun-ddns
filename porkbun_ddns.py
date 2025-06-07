@@ -6,6 +6,7 @@ import sys
 import os
 import argparse
 import logging
+from logging.handlers import RotatingFileHandler
 
 def getRecords(domain, apiConfig):
     logging.debug(f"Fetching records for domain: {domain}")
@@ -100,23 +101,35 @@ Example config.json:
     parser.add_argument("cache", help="Path to IP cache file")
     parser.add_argument("-i", "--ip", help="Specify IP manually (optional)")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    parser.add_argument("--log-file", default="/tmp/porkbun.ddns.log", help="Log file path (default: /tmp/porkbun.ddns.log)")
+    parser.add_argument("--log-max-size", type=int, default=1, help="Max log file size in MB (default: 1)")
+    parser.add_argument("--log-backup-count", type=int, default=3, help="Number of backup log files to keep (default: 3)")
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     args = parser.parse_args()
 
-    # Logging to both stdout and file
+    # Logging configuration with rotation to prevent filesystem overflow
     log_level = logging.DEBUG if args.debug else logging.INFO
     log_format = '%(asctime)s [%(levelname)s] %(message)s'
 
     logging.getLogger().setLevel(log_level)
 
+    # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
     console_handler.setFormatter(logging.Formatter(log_format))
 
-    file_handler = logging.FileHandler('/tmp/porkbun.ddns.log')
+    # Rotating file handler - configurable size and backup count
+    # This prevents filesystem overflow by limiting total log storage
+    log_file = args.log_file
+    max_bytes = args.log_max_size * 1024 * 1024  # Convert MB to bytes
+    file_handler = RotatingFileHandler(
+        log_file, 
+        maxBytes=max_bytes,
+        backupCount=args.log_backup_count
+    )
     file_handler.setLevel(log_level)
     file_handler.setFormatter(logging.Formatter(log_format))
 
