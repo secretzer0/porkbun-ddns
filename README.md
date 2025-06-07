@@ -6,10 +6,11 @@ A Python script to automatically update DNS records on Porkbun when your externa
 
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
-  - [General Installation](#general-installation)
-  - [OPNsense Installation](#opnsense-installation)
 - [Configuration](#configuration)
+- [Installation](#installation)
+  - [Linux Installation](#linux-installation)
+  - [Windows Installation](#windows-installation)
+  - [OPNsense Installation](#opnsense-installation)
 - [Usage](#usage)
 - [Automation](#automation)
 - [Logging](#logging)
@@ -37,9 +38,56 @@ A Python script to automatically update DNS records on Porkbun when your externa
 - A Porkbun account with API access enabled
 - API credentials from your Porkbun account
 
+## Configuration
+
+Create a `config.json` file with your Porkbun API credentials and domain settings:
+
+```json
+{
+    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
+    "apikey": "pk1_key",
+    "secretapikey": "sk1_key",
+    "domain": "example.com",
+    "records": [
+        { "name": "www" },
+        { "name": "home" },
+        { "name": "@" }
+    ]
+}
+```
+
+### Configuration Options
+
+- `endpoint`: The Porkbun API endpoint (defaults to https://api-ipv4.porkbun.com/api/json/v3)
+- `apikey`: Your Porkbun API key (format: pk1_...)
+- `secretapikey`: Your Porkbun secret API key (format: sk1_...)
+- `domain`: The domain you want to update
+- `records`: Array of DNS records to manage
+  - `name`: The subdomain name (use "@" for the root domain)
+
+### Getting API Credentials
+
+1. Log into your Porkbun account
+2. Go to Account → API Access
+3. Enable API access for your domain
+4. Generate your API key and secret key
+
 ## Installation
 
-### General Installation
+### Linux Installation
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/secretzer0/porkbun-ddns.git
+   cd porkbun-ddns
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Windows Installation
 
 1. Clone this repository:
    ```bash
@@ -93,18 +141,18 @@ For OPNsense firewall/router systems, follow these steps to integrate the script
 6. **Create your configuration file**:
    ```bash
    cat > /usr/local/etc/porkbun-ddns.json << 'EOF'
-{
-    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
-    "apikey": "your_actual_pk1_key_here",
-    "secretapikey": "your_actual_sk1_key_here",
-    "domain": "yourdomain.com",
-    "records": [
-        { "name": "www" },
-        { "name": "home" },
-        { "name": "@" }
-    ]
-}
-EOF
+   {
+       "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
+       "apikey": "your_actual_pk1_key_here",
+       "secretapikey": "your_actual_sk1_key_here",
+       "domain": "yourdomain.com",
+       "records": [
+           { "name": "www" },
+           { "name": "home" },
+           { "name": "@" }
+       ]
+   }
+   EOF
    ```
 
 7. **Set proper permissions for the configuration file**:
@@ -146,55 +194,6 @@ EOF
 configctl porkbun update
 ```
 
-#### Advanced OPNsense Configuration (Optional)
-
-For persistent logging across reboots, modify the action configuration:
-
-```bash
-cat > /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf << 'EOF'
-[update]
-command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
-parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache --log-file /var/log/porkbun.ddns.log
-type:script
-message:updating ddns
-description:PorkBun DDNS
-EOF
-```
-
-## Configuration
-
-Create a `config.json` file with your Porkbun API credentials and domain settings:
-
-```json
-{
-    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
-    "apikey": "pk1_key",
-    "secretapikey": "sk1_key",
-    "domain": "example.com",
-    "records": [
-        { "name": "www" },
-        { "name": "home" },
-        { "name": "@" }
-    ]
-}
-```
-
-### Configuration Options
-
-- `endpoint`: The Porkbun API endpoint (defaults to https://api-ipv4.porkbun.com/api/json/v3)
-- `apikey`: Your Porkbun API key (format: pk1_...)
-- `secretapikey`: Your Porkbun secret API key (format: sk1_...)
-- `domain`: The domain you want to update
-- `records`: Array of DNS records to manage
-  - `name`: The subdomain name (use "@" for the root domain)
-
-### Getting API Credentials
-
-1. Log into your Porkbun account
-2. Go to Account → API Access
-3. Enable API access for your domain
-4. Generate your API key and secret key
-
 ## Usage
 
 ### Basic Usage
@@ -231,7 +230,7 @@ python porkbun_ddns.py --help
 
 ## Automation
 
-### Cron Job (Linux/macOS)
+### Linux/macOS Cron
 
 Add to your crontab to run every 5 minutes:
 
