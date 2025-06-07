@@ -2,6 +2,24 @@
 
 A Python script to automatically update DNS records on Porkbun when your external IP address changes. Perfect for home servers, self-hosted services, or any scenario where you need to keep DNS records synchronized with a dynamic IP address.
 
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  - [General Installation](#general-installation)
+  - [OPNsense Installation](#opnsense-installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Automation](#automation)
+- [Logging](#logging)
+- [How It Works](#how-it-works)
+- [Troubleshooting](#troubleshooting)
+- [Security Considerations](#security-considerations)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
 ## Features
 
 - Automatic IP detection using ifconfig.me
@@ -20,6 +38,8 @@ A Python script to automatically update DNS records on Porkbun when your externa
 
 ## Installation
 
+### General Installation
+
 1. Clone this repository:
    ```bash
    git clone https://github.com/secretzer0/porkbun-ddns.git
@@ -30,6 +50,94 @@ A Python script to automatically update DNS records on Porkbun when your externa
    ```bash
    pip install -r requirements.txt
    ```
+
+### OPNsense Installation
+
+For OPNsense firewall/router systems, follow these steps to integrate the script with the system's service framework:
+
+1. **Enable SSH access** on your OPNsense system:
+   - Go to System → Settings → Administration
+   - Enable "Secure Shell" and configure as needed
+
+2. **Copy the script to the OPNsense scripts directory**:
+   ```bash
+   scp porkbun_ddns.py root@opnsense-ip:/usr/local/opnsense/scripts/dns/
+   ```
+   Or copy it manually via SSH/SCP to `/usr/local/opnsense/scripts/dns/`
+
+3. **Make the script executable**:
+   ```bash
+   ssh root@opnsense-ip
+   chmod +x /usr/local/opnsense/scripts/dns/porkbun_ddns.py
+   ```
+
+4. **Create the OPNsense action configuration file**:
+   ```bash
+   cat > /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf << 'EOF'
+[update]
+command:/usr/local/opnsense/scripts/dns/porkbun_ddns.py
+parameters:/usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache
+type:script
+message:updating ddns
+description:PorkBun DDNS
+EOF
+   ```
+   **Note:** Ensure the command path matches the exact filename (`porkbun_ddns.py`, not `porkbun-ddns.py`)
+
+5. **Set proper permissions for the action file**:
+   ```bash
+   chmod 644 /usr/local/opnsense/service/conf/actions.d/actions_porkbun.conf
+   ```
+
+6. **Create your configuration file**:
+   ```bash
+   cat > /usr/local/etc/porkbun-ddns.json << 'EOF'
+{
+    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
+    "apikey": "your_actual_pk1_key_here",
+    "secretapikey": "your_actual_sk1_key_here",
+    "domain": "yourdomain.com",
+    "records": [
+        { "name": "www" },
+        { "name": "home" },
+        { "name": "@" }
+    ]
+}
+EOF
+   ```
+
+7. **Set proper permissions for the configuration file**:
+   ```bash
+   chmod 644 /usr/local/etc/porkbun-ddns.json
+   ```
+
+8. **Restart the configuration daemon**:
+   ```bash
+   service configd restart
+   ```
+
+9. **Set up automated execution via Cron**:
+   - In the OPNsense web interface, go to **System → Settings → Cron**
+   - Click the **+** button to add a new cron job
+   - Configure your desired interval (e.g., `*/5 * * * *` for every 5 minutes)
+   - For the **Command** field, select **"PorkBun DDNS"** from the dropdown
+   - Save the configuration
+
+**OPNsense-specific Notes:**
+- Python 3 is pre-installed on OPNsense systems
+- The `requests` library is typically available by default
+- If you encounter import errors, install requests with: `python3 -m pip install requests`
+- The script logs to `/tmp/porkbun.ddns.log` which persists until reboot
+- For persistent logging, consider redirecting to `/var/log/` instead
+
+**Testing the OPNsense Installation:**
+```bash
+# Test the script manually first
+/usr/local/opnsense/scripts/dns/porkbun_ddns.py /usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache --debug
+
+# Test via the OPNsense action system
+configctl porkbun update
+```
 
 ## Configuration
 
@@ -114,6 +222,18 @@ Add this line:
 2. Create Basic Task
 3. Set trigger (e.g., every 5 minutes)
 4. Set action to start the Python script with your config and cache file paths
+
+### OPNsense Cron (Alternative Method)
+
+If you prefer command-line cron setup on OPNsense instead of the web interface:
+
+```bash
+# Edit crontab directly
+crontab -e
+
+# Add this line for every 5 minutes (adjust as needed)
+*/5 * * * * /usr/local/opnsense/scripts/dns/porkbun_ddns.py /usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache
+```
 
 ## Logging
 
