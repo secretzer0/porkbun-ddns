@@ -83,8 +83,9 @@ def main():
 Example config.json:
 
 {
-    "apikey": "your_api_key",
-    "secretapikey": "your_secret_api_key",
+    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
+    "apikey": "pk1_key",
+    "secretapikey": "sk1_key",
     "domain": "example.com",
     "records": [
         { "name": "www" },
@@ -128,7 +129,7 @@ Example config.json:
     apiConfig = {
         "apikey": config["apikey"],
         "secretapikey": config["secretapikey"],
-        "endpoint": config.get("endpoint", "https://porkbun.com/api/json/v3")
+        "endpoint": config.get("endpoint", "https://api-ipv4.porkbun.com/api/json/v3")
     }
     domain = config["domain"]
     records = config["records"]

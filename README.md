@@ -37,8 +37,9 @@ Create a `config.json` file with your Porkbun API credentials and domain setting
 
 ```json
 {
-    "apikey": "your_api_key_here",
-    "secretapikey": "your_secret_api_key_here",
+    "endpoint": "https://api-ipv4.porkbun.com/api/json/v3",
+    "apikey": "pk1_key",
+    "secretapikey": "sk1_key",
     "domain": "example.com",
     "records": [
         { "name": "www" },
@@ -50,12 +51,12 @@ Create a `config.json` file with your Porkbun API credentials and domain setting
 
 ### Configuration Options
 
-- `apikey`: Your Porkbun API key
-- `secretapikey`: Your Porkbun secret API key
+- `endpoint`: The Porkbun API endpoint (defaults to https://api-ipv4.porkbun.com/api/json/v3)
+- `apikey`: Your Porkbun API key (format: pk1_...)
+- `secretapikey`: Your Porkbun secret API key (format: sk1_...)
 - `domain`: The domain you want to update
 - `records`: Array of DNS records to manage
   - `name`: The subdomain name (use "@" for the root domain)
-- `endpoint` (optional): Custom API endpoint (defaults to Porkbun's v3 API)
 
 ### Getting API Credentials
 
