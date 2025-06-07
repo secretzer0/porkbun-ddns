@@ -5,7 +5,13 @@
 [![GitHub release](https://img.shields.io/github/release/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/releases)
 [![GitHub stars](https://img.shields.io/github/stars/secretzer0/porkbun-ddns.svg)](https://github.com/secretzer0/porkbun-ddns/stargazers)
 
-A Python script to automatically update DNS records on Porkbun when your external IP address changes. Perfect for home servers, self-hosted services, or any scenario where you need to keep DNS records synchronized with a dynamic IP address.
+A focused Python script for automatic Porkbun DNS updates, designed for reliability and simplicity. Born from frustration with expensive domain API pricing, this tool provides a lightweight alternative to complex multi-provider solutions.
+
+**Perfect for:**
+- OPNsense users wanting native service integration
+- Porkbun-focused setups that don't need ddclient's complexity  
+- Cost-conscious users who switched from expensive DNS providers
+- Homelab environments requiring reliable, minimal-dependency solutions
 
 ## Table of Contents
 
@@ -337,6 +343,21 @@ Run with `--debug` flag to see detailed operation logs:
 ```bash
 python porkbun_ddns.py config.json ip_cache.txt --debug
 ```
+
+## Frequently Asked Questions
+
+### Why not use ddclient?
+
+ddclient is excellent for multi-provider environments, but this tool offers:
+- **Native OPNsense integration** with configd service framework
+- **Porkbun-focused design** without unnecessary complexity
+- **Minimal dependencies** (just Python + requests)
+- **Filesystem-safe logging** with automatic rotation
+- **Lightweight footprint** perfect for embedded systems
+
+### Why Porkbun?
+
+Porkbun offers competitive domain pricing with free DNS management and a robust API - a cost-effective alternative to providers that charge premium rates for API access.
 
 ## Security Considerations
 
