@@ -29,6 +29,7 @@ A Python script to automatically update DNS records on Porkbun when your externa
 - Manual IP override option
 - IPv4 enforcement to prevent IPv6 issues
 - Robust error handling and validation
+- Log rotation to prevent filesystem overflow
 
 ## Prerequisites
 
@@ -123,14 +124,20 @@ EOF
    - For the **Command** field, select **"PorkBun DDNS"** from the dropdown
    - Save the configuration
 
-**OPNsense-specific Notes:**
+10. **Monitor execution**:
+    - Log files will be stored in `/tmp/porkbun.ddns.log`
+    - Check logs with: `tail -f /tmp/porkbun.ddns.log`
+
+#### OPNsense-specific Notes
+
 - Python 3 is pre-installed on OPNsense systems
 - The `requests` library is typically available by default
 - If you encounter import errors, install requests with: `python3 -m pip install requests`
 - **Logging**: Default `/tmp` location is cleared on reboot; consider using `--log-file /var/log/porkbun.ddns.log` for persistence
 - **Log rotation**: Automatically prevents `/tmp` filesystem overflow with 1MB max file size and 3 backups (4MB total max)
 
-**Testing the OPNsense Installation:**
+#### Testing the OPNsense Installation
+
 ```bash
 # Test the script manually first
 /usr/local/opnsense/scripts/dns/porkbun_ddns.py /usr/local/etc/porkbun-ddns.json /tmp/porkbun-ddns.cache --debug
@@ -139,7 +146,7 @@ EOF
 configctl porkbun update
 ```
 
-**Advanced OPNsense Configuration (Optional):**
+#### Advanced OPNsense Configuration (Optional)
 
 For persistent logging across reboots, modify the action configuration:
 ```bash
